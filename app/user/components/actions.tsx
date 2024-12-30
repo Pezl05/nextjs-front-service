@@ -10,10 +10,10 @@ export interface User {
     created_at: string;
 }
 
-export async function get_users(): Promise<User[]> {
+export async function get_users(name?:string , role?:string): Promise<User[]> {
     try {
         const cookieStore = (await cookies()).get('jwt');
-        const res = await fetch(`http://localhost:3000/api/v1/users`, {
+        const res = await fetch(`http://localhost:3000/api/v1/users/?name=${ name ? name : "" }&role=${ role ? role : ""}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",

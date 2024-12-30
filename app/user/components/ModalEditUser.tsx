@@ -1,8 +1,8 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { get_user, reset_password, delete_users } from '../actions';
+import { get_user, reset_password, delete_users } from './actions';
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
-import { edit_users } from '../actions'
+import { edit_users } from './actions'
 import { CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 
@@ -48,7 +48,7 @@ export default function ModalEditUser({ user_id, open, onClose }: EditUserProps)
                 return;
             }
 
-            onClose(true,"User successfully updated.");
+            onClose(true, "User successfully updated.");
         } catch (error) {
             console.log("Error: ", error)
             setError("Failed to edit user. Please try again.")
@@ -65,7 +65,7 @@ export default function ModalEditUser({ user_id, open, onClose }: EditUserProps)
                 return;
             }
 
-            onClose(true,`User ${username} successfully deleted.`);
+            onClose(true, `User ${username} successfully deleted.`);
         } catch (error) {
             console.log("Error: ", error)
             setError("Failed to delete user. Please try again.")
@@ -95,7 +95,7 @@ export default function ModalEditUser({ user_id, open, onClose }: EditUserProps)
     }, []);
 
     return (
-        <Dialog open={open} onClose={() => onClose(false,"")} className="relative z-10">
+        <Dialog open={open} onClose={() => onClose(false, "")} className="relative z-10">
             <DialogBackdrop
                 transition
                 className="fixed inset-0 bg-gray-500/75 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
@@ -127,11 +127,15 @@ export default function ModalEditUser({ user_id, open, onClose }: EditUserProps)
 
                         {error && (
 
-                            <div className="m-5 px-4 pb-4 pt-5 sm:p-6 sm:pb-4 bg-red-100 border-2 border-gray-600 rounded-lg">
+                            <div onClick={() => setError("")} className="cursor-pointer m-5 px-4 pb-4 pt-5 sm:p-6 sm:pb-4 bg-red-100 border-2 border-gray-600 rounded-lg">
                                 <div className="flex">
                                     <ExclamationTriangleIcon aria-hidden="true" className="size-6 text-red-600 mr-5" />
                                     <div className="text-base font-semibold text-gray-900">
-                                        {error}
+                                        {error.split("\n").map((line, index) => (
+                                            <div key={index}>
+                                                {line}
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
                             </div>
@@ -140,7 +144,7 @@ export default function ModalEditUser({ user_id, open, onClose }: EditUserProps)
 
                         {rePass && (
 
-                            <div className="m-5 px-4 pb-4 pt-5 sm:p-6 sm:pb-4 bg-green-100 border-2 border-gray-600 rounded-lg">
+                            <div onClick={() => setRePass(false)} className="cursor-pointer m-5 px-4 pb-4 pt-5 sm:p-6 sm:pb-4 bg-green-100 border-2 border-gray-600 rounded-lg">
                                 <div className="flex">
                                     <CheckCircleIcon aria-hidden="true" className="size-6 text-green-600 mr-5" />
                                     <div className="text-base font-semibold text-gray-900">

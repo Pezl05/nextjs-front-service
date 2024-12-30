@@ -1,10 +1,10 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { get_users, User } from './actions';
+import { get_users, User } from './components/actions';
 import ModalAddUser from './components/ModalAddUser';
 import ModalEditUser from './components/ModalEditUser';
 import { formatDate } from '@/lib';
-import { ExclamationTriangleIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import { ExclamationTriangleIcon, CheckCircleIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 
 export default function User() {
   // const session = useSession();
@@ -13,15 +13,17 @@ export default function User() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [addStatus, setAddStatus] = useState(false);
-  const [editStatus, setEditStatus] = useState({ status: false, message: ""});
+  const [editStatus, setEditStatus] = useState({ status: false, message: "" });
   const [editId, setEditId] = useState(Number);
+  const [searchName, setSearchName] = useState('');
+  const [searchRole, setSearchRole] = useState('');
 
-  // ฟังก์ชันดึงข้อมูลผู้ใช้
-  async function getUsers() {
-    const data = await get_users();
+  async function handleSearch() {
+    const data = await get_users(searchName, searchRole);
     setUsers(data);
     setLoading(false);
   }
+
 
   const openEditUser = (user_id: number) => {
     setEditId(user_id);
@@ -31,19 +33,18 @@ export default function User() {
   const handleAddUser = (status: boolean) => {
     setAddStatus(status);
     setShowAddModal(false);
-    getUsers();
+    handleSearch();
   };
 
   const handleEditUser = (status: boolean, message: string) => {
-    setEditStatus({status, message});
+    setEditStatus({ status, message });
     setShowEditModal(false);
-    getUsers();
+    handleSearch();
   };
 
-  // เรียกฟังก์ชัน getUsers เมื่อ component ถูกโหลด
   useEffect(() => {
-    getUsers();
-  }, []);
+    handleSearch()
+  }, [searchName, searchRole]);
 
   if (loading) {
     return (
@@ -64,7 +65,7 @@ export default function User() {
 
       {addStatus && (
 
-        <div className="px-4 pb-4 pt-5 sm:p-6 sm:pb-4 bg-green-100 flex justify-start items-center border-2 border-gray-600 rounded-lg">
+        <div onClick={() => setAddStatus(false)} className="cursor-pointer px-4 pb-4 pt-5 sm:p-6 sm:pb-4 bg-green-100 flex justify-start items-center border-2 border-gray-600 rounded-lg">
           <div className="flex items-center">
             <CheckCircleIcon aria-hidden="true" className="size-12 text-green-600 mr-5" />
             <div className="text-xl font-semibold text-gray-900">
@@ -77,32 +78,62 @@ export default function User() {
 
       {editStatus.status && (
 
-      <div className="px-4 pb-4 pt-5 sm:p-6 sm:pb-4 bg-green-100 flex justify-start items-center border-2 border-gray-600 rounded-lg">
-        <div className="flex items-center">
-          <CheckCircleIcon aria-hidden="true" className="size-12 text-green-600 mr-5" />
-          <div className="text-xl font-semibold text-gray-900">
-            { editStatus.message }
+        <div onClick={() => setEditStatus({status: false, message: ""})} className="cursor-pointer px-4 pb-4 pt-5 sm:p-6 sm:pb-4 bg-green-100 flex justify-start items-center border-2 border-gray-600 rounded-lg">
+          <div className="flex items-center">
+            <CheckCircleIcon aria-hidden="true" className="size-12 text-green-600 mr-5" />
+            <div className="text-xl font-semibold text-gray-900">
+              {editStatus.message}
+            </div>
           </div>
         </div>
-      </div>
 
       )}
 
-      <div className='flex justify-end'>
+      <div className="mb-3 flex flex-wrap items-center gap-4 sm:flex-nowrap">
+        <div className="flex w-full flex-wrap items-center gap-4 sm:flex-nowrap sm:w-auto">
+
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchName}
+            onChange={(e) => setSearchName(e.target.value)}
+            className="flex-grow rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-base text-gray-700 placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none sm:text-sm"
+          />
+
+          <div className="relative w-full sm:w-26">
+            <select
+              value={searchRole}
+              onChange={(e) => setSearchRole(e.target.value)}
+              className="w-full appearance-none rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-base text-gray-700 placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none sm:text-sm"
+            >
+              <option value="">All Roles</option>
+              <option value="member">Member</option>
+              <option value="admin">Admin</option>
+            </select>
+            <ChevronDownIcon
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-y-0 right-3 size-5 self-center text-gray-400"
+            />
+          </div>
+        </div>
+
         <button
           type="button"
           onClick={() => setShowAddModal(true)}
-          className="rounded-md bg-green-500 me-2 px-5 py-2 my-4 text-lg w-28 font-semibold text-white ring-1 drop-shadow-lg ring-gray-300 ring-inset hover:text-green-500 hover:bg-slate-50"
+          className="ml-auto rounded-md bg-green-500 px-5 py-2 text-lg font-semibold text-white ring-1 drop-shadow-lg ring-gray-300 ring-inset hover:text-green-500 hover:bg-slate-50"
         >
           Add
         </button>
       </div>
+
+
+
       <ul role="list" className="divide-y divide-gray-100 rounded-lg">
         {users.map((user) => {
           const imageUrl = user.role === 'admin' ? '/admin.png' : '/user.png';
           return (
             <li
-              key={user.email}
+              key={user.user_id}
               onClick={() => openEditUser(user?.user_id)}
               className="flex justify-between gap-x-6 py-5 px-1 py-1 sm:px-2 lg:px-4 rounded-lg group hover:bg-gray-800 cursor-pointer shadow"
             >
@@ -127,7 +158,7 @@ export default function User() {
       {showAddModal && (
         <ModalAddUser
           open={showAddModal}
-          onClose={handleAddUser} // ปิด modal
+          onClose={handleAddUser}
         />
       )}
 
@@ -135,7 +166,7 @@ export default function User() {
         <ModalEditUser
           user_id={editId}
           open={showEditModal}
-          onClose={handleEditUser} // ปิด modal
+          onClose={handleEditUser}
         />
       )}
 

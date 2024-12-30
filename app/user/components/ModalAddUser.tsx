@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
-import { add_users } from '../actions'
+import { add_users } from './actions'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 
@@ -61,7 +61,7 @@ export default function ModalAddUser({ open, onClose }: AddUserProps) {
 
                         {error && (
 
-                            <div className="m-5 px-4 pb-4 pt-5 sm:p-6 sm:pb-4 bg-red-100 border-2 border-gray-600 rounded-lg">
+                            <div onClick={() => setError("")} className="cursor-pointer m-5 px-4 pb-4 pt-5 sm:p-6 sm:pb-4 bg-red-100 border-2 border-gray-600 rounded-lg">
                                 <div className="flex">
                                     <ExclamationTriangleIcon aria-hidden="true" className="size-6 text-red-600 mr-5" />
                                     <div className="text-base font-semibold text-gray-900">

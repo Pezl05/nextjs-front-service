@@ -3,6 +3,7 @@ import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuIt
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { usePathname } from "next/navigation";
 import { useSession } from './SessionContext';
+import Link from 'next/link';
 
 
 let navigation = [
@@ -30,7 +31,7 @@ export default function Navbar() {
     }
 
     const { session } = useSession();
-    
+
     const user = {
         name: session?.username,
         email: session?.email,
@@ -38,12 +39,12 @@ export default function Navbar() {
     }
 
     const updatedNavigation = navigation.filter(item => !item.role || session?.role === item.role)
-    .map((item) => ({
-        ...item,
-        current: pathname === item.href || pathname.startsWith(item.href + '/'),
-    }));
+        .map((item) => ({
+            ...item,
+            current: pathname === item.href || pathname.startsWith(item.href + '/'),
+        }));
 
-    const currentTitle = updatedNavigation.find((item) => item.current)?.name || 'Home';
+    const currentTitle = updatedNavigation.find((item) => item.current)?.name;
 
     return (
         <>
@@ -53,11 +54,9 @@ export default function Navbar() {
                         <div className="flex h-16 items-center justify-between">
                             <div className="flex items-center">
                                 <div className="shrink-0">
-                                    <img
-                                        alt="Lamung"
-                                        src="/logo.svg"
-                                        className="size-8"
-                                    />
+                                    <Link href="/">
+                                        <img alt="Lamung" src="/logo.svg" className="size-8" />
+                                    </Link>
                                 </div>
                                 <div className="hidden md:block">
                                     <div className="ml-10 flex items-baseline space-x-4">
@@ -178,11 +177,13 @@ export default function Navbar() {
                     </DisclosurePanel>
                 </Disclosure>
 
-                <header className="bg-white shadow">
-                    <div className="mx-auto px-4 py-6 sm:px-6 lg:px-8">
-                        <h1 className="text-3xl font-bold tracking-tight text-gray-900">{currentTitle}</h1>
-                    </div>
-                </header>
+                {currentTitle && (
+                    <header className="bg-white shadow">
+                        <div className="mx-auto px-4 py-6 sm:px-6 lg:px-8">
+                            <h1 className="text-3xl font-bold tracking-tight text-gray-900">{currentTitle}</h1>
+                        </div>
+                    </header>
+                )}
             </div>
         </>
     )
