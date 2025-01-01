@@ -75,13 +75,11 @@ export default function ProjectInfo({ project_id, session }: { project_id: numbe
         const errorState = { name: !formData.get('name'), status: !formData.get('status') };
         setFormError(errorState);
         if (errorState.name || errorState.status) {
-            console.log(errorState)
             return;
         }
 
         try {
             const result = await edit_projects(project_id, formData)
-            console.log(result)
             if (!result.success) {
                 setError(result.message || "Failed to edit project. Please try again.")
                 return;

@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from "../components/SessionContext";
 import { get_projects, get_projects_by_user, Project } from './components/actions';
-import { ExclamationTriangleIcon, CheckCircleIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
+import { CheckCircleIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
 import ModalAddProject from './components/ModalAddProject';
 import Link from 'next/link';
@@ -122,43 +122,48 @@ export default function Project() {
         )}
 
         {projects
-          .sort((a, b) => a.name.localeCompare(b.name))
-          .map((project) => {
+          .sort((a, b) => {
+            const nameA = a.name || "";
+            const nameB = b.name || "";
+            return nameA.localeCompare(nameB);
+          })
+          .map((project, index) => {
             // const imageUrl = user.role === 'admin' ? '/admin.png' : '/user.png';
-            const projectStartDate = format(new Date(project.startDate), 'MMM d, yyyy');
-            const projectEndDate = format(new Date(project.endDate), 'MMM d, yyyy');
+            const projectStartDate = project.startDate ? format(new Date(project.startDate), 'MMM d, yyyy') : '';
+            const projectEndDate = project.endDate ? format(new Date(project.endDate), 'MMM d, yyyy') : '';
             const statusColor = (project.status == "completed" ? "bg-green-400" : (project.status == "in-progress" ? "bg-orange-400" : "bg-gray-400"))
             const projectStatus = (project.status == "completed" ? "Completed" : (project.status == "in-progress" ? "In Progress" : "Pending"))
             return (
-              <Link href={`/project/${project.projectId}`}>
-              <li
-                key={project.projectId}
-                // onClick={() => handleProjectInfo(project.projectId, project.name)}
-                className="flex justify-between gap-x-6 py-5 px-1 py-1 sm:px-2 lg:px-4 rounded-lg group hover:bg-gray-800 cursor-pointer shadow"
-              >
-                
-                <div className="flex min-w-0 gap-x-4">
-                  {/* <img alt="" src={imageUrl} className="size-12 flex-none rounded-full bg-gray-50" /> */}
-                  <div className={`size-12 flex-none rounded-full ring-2 ring-gray-900 ${statusColor}`}></div>
-                  <div className="min-w-0 flex-auto">
-                    <p className="text-sm/6 font-semibold text-gray-900 group-hover:text-white">{project.name}</p>
-                    <p className="mt-1 truncate text-xs/5 text-gray-500 group-hover:text-slate-400">{project.description || "No Description"}</p>
+              <Link href={`/project/${project.projectId}`} >
+                <li
+                  key={project.projectId}
+                  // onClick={() => handleProjectInfo(project.projectId, project.name)}
+                  className="flex justify-between gap-x-6 py-5 px-1 py-1 sm:px-2 lg:px-4 rounded-lg group hover:bg-gray-800 cursor-pointer shadow"
+                >
+
+                  <div className="flex min-w-0 gap-x-4">
+                    {/* <img alt="" src={imageUrl} className="size-12 flex-none rounded-full bg-gray-50" /> */}
+                    <div className={`size-12 flex-none rounded-full ring-2 ring-gray-900 ${statusColor}`}></div>
+                    <div className="min-w-0 flex-auto">
+                      <p className="text-sm/6 font-semibold text-gray-900 group-hover:text-white">{project.name}</p>
+                      <p className="mt-1 truncate text-xs/5 text-gray-500 group-hover:text-slate-400">{project.description || "No Description"}</p>
+                    </div>
                   </div>
-                </div>
-                <div className="hidden shrink-0 xs:flex xs:flex-col xs:items-end">
-                  <p className="text-sm/6 text-gray-900 group-hover:text-white">{projectStatus}</p>
-                  <p className="mt-1 text-xs/5 text-gray-500 group-hover:text-slate-400">
-                    {project.startDate && project.endDate ? (
-                      <>Timeline <time dateTime={projectStartDate}>{projectStartDate}</time> - <time dateTime={projectEndDate}>{projectEndDate}</time></>
-                    ) : (
-                      <div className='text-orange-600'>Timeline not set</div>
-                    )}
-                  </p>
-                </div>
-              </li>
+                  <div className="hidden shrink-0 xs:flex xs:flex-col xs:items-end">
+                    <p className="text-sm/6 text-gray-900 group-hover:text-white">{projectStatus}</p>
+                    <p className="mt-1 text-xs/5 text-gray-500 group-hover:text-slate-400">
+                      {project.startDate && project.endDate ? (
+                        <>Timeline <time dateTime={projectStartDate}>{projectStartDate}</time> - <time dateTime={projectEndDate}>{projectEndDate}</time></>
+                      ) : (
+                        <div className='text-orange-600'>Timeline not set</div>
+                      )}
+                    </p>
+                  </div>
+                </li>
               </Link>
             );
-          })}
+          })
+        }
       </ul>
 
       {showAddModal && (

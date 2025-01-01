@@ -1,8 +1,7 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import { useSession } from "./components/SessionContext";
-import { ChevronDownIcon } from '@heroicons/react/24/outline';
-
+import HomeTask from './components/HomeTask';
 
 export default function Home() {
   const { session } = useSession();
@@ -31,9 +30,8 @@ export default function Home() {
   }
 
   return (
-    <div>
-      Home Page
-      <pre>{JSON.stringify(session, null, 2)}</pre>
+    <div className="mx-auto px-1 py-5 sm:px-2 lg:px-4">
+      <HomeTask session={session}/>
     </div>
   );
 }

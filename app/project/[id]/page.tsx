@@ -3,6 +3,7 @@ import { useSession } from '@/app/components/SessionContext'
 import ProjectInfo from './components/ProjectInfo'
 import ProjectMembers from './components/ProjectMember'
 import { useState, useEffect } from 'react'
+import ProjectTask from './components/ProjectTask'
 
 
 export default function ProjectPage({
@@ -45,12 +46,10 @@ export default function ProjectPage({
           <>
             <ProjectInfo project_id={projectId} session={session} />
             <ProjectMembers project_id={projectId} session={session} />
+            <ProjectTask project_id={projectId} session={session} />
           </>
         )}
 
-        <div className="sm:col-span-8 rounded-md border border-gray-300 bg-white p-5 text-base text-gray-700 ">
-
-        </div>
 
       </div>
 
