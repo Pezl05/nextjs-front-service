@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { get_user, reset_password, delete_users } from './actions';
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
 import { edit_users } from './actions'
@@ -23,14 +23,15 @@ export default function ModalEditUser({ user_id, open, onClose }: EditUserProps)
     const [last_name, setLastName] = useState("");
     const [role, setRole] = useState("member");
 
-    async function getUser() {
+
+    const getUser = useCallback(async () => {
         const data = await get_user(user_id);
         setUsername(data?.username || "")
         setFirstName(data?.full_name?.split(" ")[0] || "")
         setLastName(data?.full_name?.split(" ").slice(1).join(" ") || "")
         setRole(data?.role || "member")
         setLoading(false)
-    }
+    }, [user_id]);
 
     async function handleEditUser(formData: FormData) {
         const errorState = { username: !formData.get('username'), first_name: !formData.get('first_name'), last_name: !formData.get('last_name') };
@@ -92,7 +93,7 @@ export default function ModalEditUser({ user_id, open, onClose }: EditUserProps)
 
     useEffect(() => {
         getUser()
-    }, []);
+    }, [getUser]);
 
     return (
         <Dialog open={open} onClose={() => onClose(false, "")} className="relative z-10">

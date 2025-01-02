@@ -1,16 +1,17 @@
 'use client'
-import { useState, useEffect } from 'react'
-import { User, get_users } from '@/app/user/components/actions'
+import { useState, useEffect, useCallback } from 'react'
+import { Session } from '@/app/components/SessionContext';
+import { get_users } from '@/app/user/components/actions'
 import { add_project_member, delete_project_members } from '../../components/actions'
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
-import { ProjectMember } from '../../components/actions'
+import type { User } from '@/app/user/components/actions'
+import type { ProjectMember } from '../../components/actions'
 import { ExclamationTriangleIcon, PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
-
 
 interface EditMemberProps {
     project_id: number;
     project_members: ProjectMember[];
-    session: any;
+    session: Session | null;
     open: boolean;
     onClose: (edit_startus: string) => void;
 }
@@ -24,7 +25,7 @@ export default function ModalEditMember({ project_id, project_members, session, 
     const [members, setMembers] = useState<number[]>([]);
     const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
 
-    async function getUsers() {
+    const getUsers = useCallback(async () => {
         try {
             const data = await get_users();
             setUsers(data);
@@ -39,13 +40,13 @@ export default function ModalEditMember({ project_id, project_members, session, 
         } catch (error) {
             console.error("Error fetching users:", error);
         }
-    }
+    }, [project_members]);
 
     async function handleEdirMember() {
         try {
 
-            let failed: string[] = [];
-            let success: string[] = [];
+            const failed: string[] = [];
+            const success: string[] = [];
 
             const deleteMembers = members.filter((id) => !selectedUsers.includes(id));
             for (const user_id of deleteMembers) {
@@ -92,6 +93,7 @@ export default function ModalEditMember({ project_id, project_members, session, 
             onClose(`${success.length > 0 ? `Successfully to edit members in project.\n- ${success.join("\n- ")}` : ""}`)
 
         } catch (error) {
+            console.error('Failed to edit members in project.', error);
             setError("Failed to edit members in project.");
         }
     }
@@ -99,8 +101,8 @@ export default function ModalEditMember({ project_id, project_members, session, 
     const toggleSelection = (user_id: number) => {
         setSelectedUsers((prev) =>
             prev.includes(user_id)
-                ? prev.filter((id) => id !== user_id) // Remove if already selected
-                : [user_id, ...prev] // Add new user at the front
+                ? prev.filter((id) => id !== user_id)
+                : [user_id, ...prev]
         );
     };
 
@@ -143,7 +145,7 @@ export default function ModalEditMember({ project_id, project_members, session, 
 
     useEffect(() => {
         getUsers()
-    }, []);
+    }, [getUsers]);
 
     return (
         <Dialog open={open} onClose={() => onClose("")} className="relative z-10">
@@ -196,25 +198,23 @@ export default function ModalEditMember({ project_id, project_members, session, 
                             }} >
                             <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 h-full">
                                 <div className="flex">
-                                    {/* Left side: Not selected users */}
                                     <div className="w-1/2 p-5 border-r-2">
                                         <h2 className="text-lg font-semibold mb-2">Available Users</h2>
                                         <ul role="list" className="divide-y divide-gray-100 rounded-lg max-h-80 overflow-y-auto">
                                             {users
-                                                .filter((user) => !isSelected(user.user_id) && user.user_id !== session?.user_id) // Exclude selected users and session user
-                                                .sort((a, b) => a.user_id === session?.user_id ? -1 : b.user_id === session?.user_id ? 1 : 0) // Sort to keep session?.user_id at the top
+                                                .filter((user) => !isSelected(user.user_id) && user.user_id !== session?.user_id)
+                                                .sort((a, b) => a.user_id === session?.user_id ? -1 : b.user_id === session?.user_id ? 1 : 0)
                                                 .map((user) => renderUser(user))}
                                         </ul>
                                     </div>
 
-                                    {/* Right side: Selected users */}
                                     <div className="w-1/2 p-5 border-l-2">
                                         <h2 className="text-lg font-semibold mb-2">Members</h2>
                                         <ul role="list" className="divide-y divide-gray-100 rounded-lg max-h-80 overflow-y-auto">
                                             {selectedUsers
-                                                .map((userId) => users.find((user) => user.user_id === userId)) // Find the user by user_id
-                                                .filter((user) => user !== undefined) // Filter out undefined users
-                                                .map((user) => renderUser(user!)) // Force type to User
+                                                .map((userId) => users.find((user) => user.user_id === userId))
+                                                .filter((user) => user !== undefined)
+                                                .map((user) => renderUser(user!))
                                             }
                                         </ul>
                                     </div>

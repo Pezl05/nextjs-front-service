@@ -1,8 +1,7 @@
 'use client';
-
 import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 
-interface Session {
+export interface Session {
   user_id: number;
   role: string;
   username: string;

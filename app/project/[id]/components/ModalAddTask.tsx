@@ -3,7 +3,7 @@ import { useState, useRef } from 'react'
 import { format } from 'date-fns';
 import { add_tasks } from '../../components/actions';
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
-import { CheckCircleIcon, ChevronDownIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { ChevronDownIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 
 interface AddUserProps {

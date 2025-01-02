@@ -1,13 +1,15 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import type { Session } from '@/app/components/SessionContext';
 import { format } from 'date-fns';
-import { Task, TaskSearch, get_tasks, delete_task } from '../../components/actions';
-import { ChevronDownIcon, CheckCircleIcon, PencilIcon, TrashIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
+import { get_tasks, delete_task } from '../../components/actions';
+import type { Task, TaskSearch } from '../../components/actions';
+import { ChevronDownIcon, CheckCircleIcon, PencilIcon, TrashIcon, InformationCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import ModalAddTask from './ModalAddTask';
 import ModalEditTask from './ModalEditTask';
 import ModalDelete from '@/app/components/ModalDelete';
 
-export default function ProjectTask({ project_id, session }: { project_id: number, session: any }) {
+export default function ProjectTask({ project_id, session }: { project_id: number, session: Session  | null }) {
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -33,7 +35,7 @@ export default function ProjectTask({ project_id, session }: { project_id: numbe
         }));
     };
 
-    async function getProjectTasks() {
+    const getProjectTasks = useCallback(async () => {
         try {
             const data: Task[] = await get_tasks(tasksSearch);
             setTasks(data)
@@ -42,7 +44,7 @@ export default function ProjectTask({ project_id, session }: { project_id: numbe
             console.error('Error fetching project data:', error);
             return null;
         }
-    }
+    }, [tasksSearch]);
 
     const handleAddTask = (status: string) => {
         setAddStatus(status);
@@ -98,7 +100,7 @@ export default function ProjectTask({ project_id, session }: { project_id: numbe
 
     useEffect(() => {
         getProjectTasks()
-    }, [tasksSearch]);
+    }, [getProjectTasks]);
 
     return (
 
@@ -176,6 +178,19 @@ export default function ProjectTask({ project_id, session }: { project_id: numbe
                 </div>
             </div>
 
+            {error && (
+
+                <div onClick={() => setError("")} className="cursor-pointer m-5 px-4 pb-4 pt-5 sm:p-6 sm:pb-4 bg-red-100 border-2 border-gray-600 rounded-lg">
+                    <div className="flex">
+                        <ExclamationTriangleIcon aria-hidden="true" className="size-6 text-red-600 mr-5" />
+                        <div className="text-base font-semibold text-gray-900">
+                            {error}
+                        </div>
+                    </div>
+                </div>
+
+            )}
+
             {addStatus && (
 
                 <div onClick={() => setAddStatus("")} className="cursor-pointer m-5 px-4 pb-4 pt-5 sm:p-6 sm:pb-4 bg-green-100 flex justify-start items-center border-2 border-gray-600 rounded-lg">
@@ -248,15 +263,13 @@ export default function ProjectTask({ project_id, session }: { project_id: numbe
                                         {task.due_date ? format(new Date(task.due_date?.toString()), 'MMM d, yyyy') : ""}
                                     </td>
                                     <td className="border border-gray-300 px-4 py-2 text-sm text-gray-700 flex justify-center space-x-2">
-                                        {/* Information Icon */}
                                         <button
                                             className="bg-blue-500 hover:bg-blue-600 text-white rounded-full p-2"
-                                            onClick={() => setEdit(false,task)}
+                                            onClick={() => setEdit(false, task)}
                                         >
                                             <InformationCircleIcon className="h-5 w-5" />
                                         </button>
 
-                                        {/* Admin Only Icons */}
                                         {session?.role === 'admin' && (
                                             <>
                                                 <button
@@ -294,7 +307,7 @@ export default function ProjectTask({ project_id, session }: { project_id: numbe
             {showAddModal && (
                 <ModalAddTask
                     project_id={project_id}
-                    create_by={session.user_id}
+                    create_by={session?.user_id || 0}
                     open={showAddModal}
                     onClose={handleAddTask}
                 />

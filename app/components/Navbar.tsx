@@ -6,7 +6,7 @@ import { useSession } from './SessionContext';
 import Link from 'next/link';
 
 
-let navigation = [
+const navigation = [
     { name: 'Home', href: '/', current: false },
     { name: 'Projects', href: '/project', current: false },
     { name: 'Admin', href: '/user', current: false, role: 'admin' },
@@ -24,13 +24,12 @@ function classNames(...classes: string[]) {
 
 export default function Navbar() {
 
+    const { session } = useSession();
     const pathname = usePathname();
 
     if (pathname === '/login') {
         return null;
     }
-
-    const { session } = useSession();
 
     const user = {
         name: session?.username,
@@ -87,13 +86,12 @@ export default function Navbar() {
                                         <BellIcon aria-hidden="true" className="size-6" />
                                     </button> */}
 
-                                    {/* Profile dropdown */}
                                     <Menu as="div" className="relative ml-3">
                                         <div>
                                             <MenuButton className="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                                                 <span className="absolute -inset-1.5" />
                                                 <span className="sr-only">Open user menu</span>
-                                                <img alt="" src={user.imageUrl} className="size-8 rounded-full" />
+                                                <img alt={user.name || ""} src={user.imageUrl} className="size-8 rounded-full" />
                                             </MenuButton>
                                         </div>
                                         <MenuItems
@@ -115,7 +113,6 @@ export default function Navbar() {
                                 </div>
                             </div>
                             <div className="-mr-2 flex md:hidden">
-                                {/* Mobile menu button */}
                                 <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                                     <span className="absolute -inset-0.5" />
                                     <span className="sr-only">Open main menu</span>

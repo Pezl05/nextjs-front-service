@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSession } from "./components/SessionContext";
 import HomeTask from './components/HomeTask';
 
@@ -7,13 +7,13 @@ export default function Home() {
   const { session } = useSession();
   const [loading, setLoading] = useState(true);
 
-  async function getProjects() {
+  const getProjects = useCallback(async () => {
     setLoading(false);
-  }
+  }, []);
 
   useEffect(() => {
     getProjects();
-  }, []);
+  }, [getProjects]);
 
   if (loading) {
     return (

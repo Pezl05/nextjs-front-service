@@ -1,11 +1,13 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
-import { get_project, edit_projects, Project } from '../../components/actions';
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { get_project, edit_projects } from '../../components/actions';
+import type { Project } from '../../components/actions';
+import type { Session } from '@/app/components/SessionContext';
 import { format } from 'date-fns';
 import { CheckCircleIcon, ChevronDownIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import { redirect } from 'next/navigation';
 
-export default function ProjectInfo({ project_id, session }: { project_id: number, session: any }) {
+export default function ProjectInfo({ project_id, session }: { project_id: number, session: Session | null }) {
 
     const [loading, setLoading] = useState(true);
     const [canEdit, setCanEdit] = useState(false);
@@ -14,21 +16,21 @@ export default function ProjectInfo({ project_id, session }: { project_id: numbe
     const [formError, setFormError] = useState({ name: false, status: false });
     const [error, setError] = useState("");
 
-    const [projectName, setProjectName] = useState('');
-    const [projectDescribe, setProjectDescribe] = useState<string>('');
+    const [projectName, setProjectName] = useState("");
+    const [projectDescribe, setProjectDescribe] = useState<string>("");
 
     const [projectStatus, setProjectStatus] = useState('pending');
     const statusRef = useRef<HTMLSelectElement | null>(null);
 
-    const [startDate, setStartDate] = useState<string>();
+    const [startDate, setStartDate] = useState<string>("");
     const startDateRef = useRef<HTMLInputElement>(null!);
 
-    const [endDate, setEndDate] = useState<string>();
+    const [endDate, setEndDate] = useState<string>("");
     const endDateRef = useRef<HTMLInputElement>(null!);
 
-    const [updateDate, setUpdateDate] = useState<string>();
+    const [updateDate, setUpdateDate] = useState<string>("");
 
-    async function getProject() {
+    const getProject = useCallback(async () => {
         try {
             const data: Project = await get_project(project_id);
             setProjectName(data.name)
@@ -46,7 +48,7 @@ export default function ProjectInfo({ project_id, session }: { project_id: numbe
             console.error('Error fetching project data:', error);
             redirect('/404');
         }
-    }
+    }, [project_id]);
 
 
     const handleDateClick = (ref: React.RefObject<HTMLInputElement>) => {
@@ -103,7 +105,7 @@ export default function ProjectInfo({ project_id, session }: { project_id: numbe
 
     useEffect(() => {
         getProject()
-    }, []);
+    }, [getProject]);
 
     return (
 
@@ -231,7 +233,7 @@ export default function ProjectInfo({ project_id, session }: { project_id: numbe
                                     name="description"
                                     disabled={!canEdit}
                                     rows={3}
-                                    value={projectDescribe}
+                                    value={projectDescribe || ""}
                                     onChange={(e) => setProjectDescribe(e.target.value)}
                                     className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                                 />

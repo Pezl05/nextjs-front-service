@@ -1,10 +1,10 @@
 'use client'
 import { useState, useRef } from 'react'
-import { Task } from '../../components/actions';
+import type { Task } from '../../components/actions';
 import { format } from 'date-fns';
 import { edit_tasks } from '../../components/actions';
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
-import { CheckCircleIcon, ChevronDownIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { ChevronDownIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 
 interface EditTaskProps {
@@ -17,7 +17,6 @@ interface EditTaskProps {
 export default function ModalEditTask({ isEdit, task, open, onClose }: EditTaskProps) {
 
     const [formError, setFormError] = useState({ title: false, phase: false, status: false });
-    const [canEdit, setCanEdit] = useState(isEdit);
     const [error, setError] = useState("");
 
     const [title, seTtitle] = useState(task?.title);
@@ -97,7 +96,7 @@ export default function ModalEditTask({ isEdit, task, open, onClose }: EditTaskP
                     >
                         <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row sm:px-6">
                             <DialogTitle as="h3" className="text-2xl font-semibold text-gray-800">
-                                {canEdit ? "Edit Tasks" : "Tasks Detail"}
+                                {isEdit ? "Edit Tasks" : "Tasks Detail"}
                             </DialogTitle>
                         </div>
 
@@ -124,7 +123,7 @@ export default function ModalEditTask({ isEdit, task, open, onClose }: EditTaskP
                                 <div className="grid gap-x-6 gap-y-4  grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-4">
                                     <div className="sm:col-span-2">
                                         <label htmlFor="name" className="block text-sm/6 font-medium text-gray-900">
-                                            Title {canEdit && (<span className='text-red-500'> * </span>)}
+                                            Title {isEdit && (<span className='text-red-500'> * </span>)}
                                         </label>
                                         <div className="mt-2">
                                             <input
@@ -132,7 +131,7 @@ export default function ModalEditTask({ isEdit, task, open, onClose }: EditTaskP
                                                 name="title"
                                                 type="text"
                                                 value={title}
-                                                disabled={!canEdit}
+                                                disabled={!isEdit}
                                                 onChange={(e) => seTtitle(e.target.value)}
                                                 autoComplete="name"
                                                 className={`block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6
@@ -147,7 +146,7 @@ export default function ModalEditTask({ isEdit, task, open, onClose }: EditTaskP
                                             className="block text-sm/6 font-medium text-gray-900"
                                             onClick={() => phaseRef.current?.click()}
                                         >
-                                            Phase {canEdit && (<span className='text-red-500'> * </span>)}
+                                            Phase {isEdit && (<span className='text-red-500'> * </span>)}
                                         </label>
                                         <div className="mt-2 relative w-full sm:w-26">
                                             <select
@@ -155,7 +154,7 @@ export default function ModalEditTask({ isEdit, task, open, onClose }: EditTaskP
                                                 name="phase"
                                                 ref={phaseRef}
                                                 value={taskPhase}
-                                                disabled={!canEdit}
+                                                disabled={!isEdit}
                                                 onChange={(e) => setTaskPhase(e.target.value)}
                                                 className="w-full appearance-none rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-base text-gray-700 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm"
                                             >
@@ -163,7 +162,7 @@ export default function ModalEditTask({ isEdit, task, open, onClose }: EditTaskP
                                                 <option value="maintanence">Maintanence</option>
                                             </select>
 
-                                            {canEdit && (
+                                            {isEdit && (
                                                 <ChevronDownIcon
                                                     aria-hidden="true"
                                                     className="pointer-events-none absolute inset-y-0 right-3 size-5 self-center text-gray-400"
@@ -179,7 +178,7 @@ export default function ModalEditTask({ isEdit, task, open, onClose }: EditTaskP
                                             className="block text-sm/6 font-medium text-gray-900"
                                             onClick={() => statusRef.current?.click()}
                                         >
-                                            Status {canEdit && (<span className='text-red-500'> * </span>)}
+                                            Status {isEdit && (<span className='text-red-500'> * </span>)}
                                         </label>
                                         <div className="mt-2 relative w-full sm:w-26">
                                             <select
@@ -187,7 +186,7 @@ export default function ModalEditTask({ isEdit, task, open, onClose }: EditTaskP
                                                 name="status"
                                                 ref={statusRef}
                                                 value={taskStatus}
-                                                disabled={!canEdit}
+                                                disabled={!isEdit}
                                                 onChange={(e) => setTaskStatus(e.target.value)}
                                                 className="w-full appearance-none rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-base text-gray-700 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm"
                                             >
@@ -196,7 +195,7 @@ export default function ModalEditTask({ isEdit, task, open, onClose }: EditTaskP
                                                 <option value="completed">Completed</option>
                                             </select>
 
-                                            {canEdit && (
+                                            {isEdit && (
                                                 <ChevronDownIcon
                                                     aria-hidden="true"
                                                     className="pointer-events-none absolute inset-y-0 right-3 size-5 self-center text-gray-400"
@@ -216,7 +215,7 @@ export default function ModalEditTask({ isEdit, task, open, onClose }: EditTaskP
                                                 name="description"
                                                 rows={3}
                                                 value={taskDescribe}
-                                                disabled={!canEdit}
+                                                disabled={!isEdit}
                                                 onChange={(e) => setTaskDescribe(e.target.value)}
                                                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                                             />
@@ -235,7 +234,7 @@ export default function ModalEditTask({ isEdit, task, open, onClose }: EditTaskP
                                             <button
                                                 id="bt_start_date"
                                                 type="button"
-                                                disabled={!canEdit}
+                                                disabled={!isEdit}
                                                 onClick={() => handleDateClick(startDateRef)}
                                                 className="relative z-10 block w-full h-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                                             >
@@ -247,7 +246,7 @@ export default function ModalEditTask({ isEdit, task, open, onClose }: EditTaskP
                                                 name="start_date"
                                                 type="date"
                                                 value={startDate}
-                                                disabled={!canEdit}
+                                                disabled={!isEdit}
                                                 ref={startDateRef}
                                                 onChange={(e) => handleDate(e.target.value, 'start')}
                                                 className="absolute inset-0 z-0 w-full h-full opacity-0 pointer-events-none"
@@ -268,7 +267,7 @@ export default function ModalEditTask({ isEdit, task, open, onClose }: EditTaskP
                                             <button
                                                 id="bt_end_date"
                                                 type="button"
-                                                disabled={!canEdit}
+                                                disabled={!isEdit}
                                                 onClick={() => handleDateClick(dueDateRef)}
                                                 className="relative z-10 block w-full h-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                                             >
@@ -281,7 +280,7 @@ export default function ModalEditTask({ isEdit, task, open, onClose }: EditTaskP
                                                 type="date"
                                                 min={startDate}
                                                 value={dueDate}
-                                                disabled={!canEdit}
+                                                disabled={!isEdit}
                                                 ref={dueDateRef}
                                                 onChange={(e) => handleDate(e.target.value, 'due')}
                                                 className="absolute inset-0 z-0 w-full h-full opacity-0 pointer-events-none"
@@ -291,7 +290,7 @@ export default function ModalEditTask({ isEdit, task, open, onClose }: EditTaskP
                                 </div>
                             </div>
                             <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                                {canEdit && (
+                                {isEdit && (
                                     <button
                                         type="submit"
                                         className="inline-flex w-full justify-center rounded-md bg-green-500 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-green-500 sm:ml-3 sm:w-20"

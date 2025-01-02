@@ -10,17 +10,18 @@ export interface User {
     created_at: string;
 }
 
+const AUTH_API = process.env.AUTH_API
+
 export async function get_users(name?:string , role?:string): Promise<User[]> {
     try {
         const cookieStore = (await cookies()).get('jwt');
-        const res = await fetch(`http://localhost:3000/api/v1/users/?name=${ name ? name : "" }&role=${ role ? role : ""}`, {
+        const res = await fetch(`${AUTH_API}/api/v1/users/?name=${ name ? name : "" }&role=${ role ? role : ""}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
                 "Cookie": `jwt=${cookieStore?.value}`
             }
         })
-        console.log(res)
         if (!res.ok) {
             throw new Error("Failed to fetch users");
         }
@@ -35,14 +36,13 @@ export async function get_users(name?:string , role?:string): Promise<User[]> {
 export async function get_user(user_id: number): Promise<User> {
     try {
         const cookieStore = (await cookies()).get('jwt');
-        const res = await fetch(`http://localhost:3000/api/v1/users/${user_id}`, {
+        const res = await fetch(`${AUTH_API}/api/v1/users/${user_id}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
                 "Cookie": `jwt=${cookieStore?.value}`
             }
         })
-        console.log(res)
         if (!res.ok) {
             throw new Error("Failed to fetch users");
         }
@@ -67,7 +67,7 @@ export async function add_users(formData: FormData) {
 
     try {
         const cookieStore = (await cookies()).get('jwt');
-        const res = await fetch("http://localhost:3000/api/v1/register", {
+        const res = await fetch(`${AUTH_API}/api/v1/register`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -101,7 +101,7 @@ export async function edit_users(user_id: number ,formData: FormData) {
 
     try {
         const cookieStore = (await cookies()).get('jwt');
-        const res = await fetch(`http://localhost:3000/api/v1/users/${user_id}`, {
+        const res = await fetch(`${AUTH_API}/api/v1/users/${user_id}`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
@@ -127,7 +127,7 @@ export async function delete_users(user_id: number) {
     
     try {
         const cookieStore = (await cookies()).get('jwt');
-        const res = await fetch(`http://localhost:3000/api/v1/users/${user_id}`, {
+        const res = await fetch(`${AUTH_API}/api/v1/users/${user_id}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
@@ -154,7 +154,7 @@ export async function reset_password(user_id: number, password?: string) {
         const newPassword = password || `P@ssw0rd@${new Date().getFullYear()}`;
 
         const cookieStore = (await cookies()).get('jwt');
-        const res = await fetch(`http://localhost:3000/api/v1/users/${user_id}`, {
+        const res = await fetch(`${AUTH_API}/api/v1/users/${user_id}`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",

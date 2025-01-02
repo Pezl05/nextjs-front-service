@@ -45,14 +45,12 @@ export default function Login() {
                 </div>
                 <h1 className="text-4xl font-bold text-center mb-6">Sign in to your account</h1>
                 
-                {/* Form */}
                 <form className="space-y-6"
                     onSubmit={(e) => {
                         e.preventDefault()
                         const formData = new FormData(e.target as HTMLFormElement)
                         handleLogin(formData)
                 }} >
-                    {/* Username */}
                     <div>
                         <label htmlFor="username" className="flex items-center justify-between">
                             <div className="block text-sm/6 font-semibold text-gray-700">
@@ -76,7 +74,6 @@ export default function Login() {
                         </div>
                     </div>
 
-                    {/* Password */}
                     <div>
                         <label htmlFor="password" className="flex items-center justify-between">
                             <div className="block text-sm/6 font-semibold text-gray-700">
@@ -100,7 +97,6 @@ export default function Login() {
                         </div>
                     </div>
 
-                    {/* Sign In Button */}
                     <div>
                         <button
                             type="submit"

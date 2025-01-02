@@ -2,9 +2,9 @@
 
 import { jwtVerify } from "jose";
 import { cookies } from 'next/headers'
-import { NextResponse } from 'next/server';
 
-const JWT_SECRET = "P@ssw0rd"
+const JWT_SECRET = process.env.JWT_SECRET
+const AUTH_API = process.env.AUTH_API
 const key = new TextEncoder().encode(JWT_SECRET);
 
 export async function  decrypt(token: string): Promise<any> {
@@ -28,7 +28,7 @@ export async function login(formData: FormData) {
     const rawFormDataJson = JSON.stringify(rawFormData)
   
     try {
-      const res = await fetch("http://localhost:3000/api/v1/login", {
+      const res = await fetch(`${AUTH_API}/api/v1/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -48,10 +48,8 @@ export async function login(formData: FormData) {
             maxAge: 60 * 60 * 24, // 24 hours
           })
         }
-        console.log("Login Success")
         return { success: true }
       } else {
-        console.log("Unauthorized")
         return { success: false, message: "Invalid username or password. Please check and try again." }
       }
   

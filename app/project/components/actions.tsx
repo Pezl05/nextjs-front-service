@@ -50,8 +50,8 @@ export interface TaskSearch {
     limit?: number;
 }
 
-const PROJECT_API = "http://localhost:3001"
-const TASK_API = "http://localhost:3002"
+const PROJECT_API = process.env.PROJECT_API
+const TASK_API = process.env.TASK_API
 
 
 export async function get_projects(name?: string, status?: string): Promise<Project[]> {
@@ -180,7 +180,6 @@ export async function edit_projects(project_id: number, formData: FormData) {
     }
 
     const rawFormDataJson = JSON.stringify(rawFormData)
-    console.log(rawFormDataJson)
 
     try {
         const cookieStore = (await cookies()).get('jwt');
@@ -194,14 +193,11 @@ export async function edit_projects(project_id: number, formData: FormData) {
             credentials: 'include'
         })
 
-        console.log(res)
-
         if (!res.ok) {
             const errorData = await res.json();
             return { success: false, message: errorData.message || "Failed to edit project. Please try again." }
         }
 
-        console.log("success")
         return { success: true, message: "Project successfully updated." }
     } catch (error) {
         console.log("Error: ", error);
@@ -264,8 +260,6 @@ export async function add_project_member(project_id: number, user_id: number) {
     }
 
     const rawFormDataJson = JSON.stringify(rawFormData)
-
-    console.log(rawFormDataJson)
 
     try {
         const cookieStore = (await cookies()).get('jwt');
@@ -341,8 +335,8 @@ export async function get_tasks(search?: TaskSearch): Promise<Task[]> {
                 "Cookie": `jwt=${cookieStore?.value}`
             }
         })
-        console.log(param)
-        console.log(res)
+
+
         if (!res.ok) {
             throw new Error("Failed to fetch tasks.");
         }
@@ -388,8 +382,6 @@ export async function add_tasks(project_id: number, created_by: number, formData
             credentials: 'include'
         })
 
-        console.log(res)
-
         if (!res.ok) {
             const errorData = await res.json();
             return { success: false, message: errorData.message || "Failed to add task. Please try again." }
@@ -433,8 +425,6 @@ export async function edit_tasks(task_id: number, formData: FormData) {
             body: rawFormDataJson,
             credentials: 'include'
         })
-
-        console.log(res)
 
         if (!res.ok) {
             const errorData = await res.json();

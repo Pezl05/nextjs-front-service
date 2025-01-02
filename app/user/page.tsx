@@ -1,10 +1,11 @@
 'use client'
-import { useState, useEffect } from 'react'
-import { get_users, User } from './components/actions';
+import { useState, useEffect, useCallback } from 'react'
+import { get_users } from './components/actions';
+import type { User } from './components/actions';
 import ModalAddUser from './components/ModalAddUser';
 import ModalEditUser from './components/ModalEditUser';
 import { formatDate } from '@/lib';
-import { ExclamationTriangleIcon, CheckCircleIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
+import { CheckCircleIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 
 export default function User() {
   // const session = useSession();
@@ -18,11 +19,11 @@ export default function User() {
   const [searchName, setSearchName] = useState('');
   const [searchRole, setSearchRole] = useState('');
 
-  async function handleSearch() {
+  const handleSearch = useCallback(async () => {
     const data = await get_users(searchName, searchRole);
     setUsers(data);
     setLoading(false);
-  }
+  }, [searchName, searchRole]); 
 
 
   const openEditUser = (user_id: number) => {
@@ -44,7 +45,7 @@ export default function User() {
 
   useEffect(() => {
     handleSearch()
-  }, [searchName, searchRole]);
+  }, [handleSearch]);
 
   if (loading) {
     return (

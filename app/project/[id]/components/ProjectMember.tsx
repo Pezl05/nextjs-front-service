@@ -1,11 +1,12 @@
 'use client'
-import { useState, useEffect } from 'react'
-import { ProjectMember, get_project_member } from '../../components/actions'
+import { useState, useEffect, useCallback } from 'react'
+import type { Session } from '@/app/components/SessionContext';
+import { get_project_member } from '../../components/actions'
+import type { ProjectMember } from '../../components/actions'
 import { CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import ModalEditMember from '../components/ModalEditMember'
 
-
-export default function ProjectMembers({ project_id, session }: { project_id: number, session: any }) {
+export default function ProjectMembers({ project_id, session }: { project_id: number, session: Session  | null }) {
 
     const [loading, setLoading] = useState(true);
     const [projectMembers, setProjectMembers] = useState<ProjectMember[]>([]);
@@ -15,7 +16,7 @@ export default function ProjectMembers({ project_id, session }: { project_id: nu
     const [editStatus, setEditStatus] = useState("");
 
 
-    async function getProjectMembers() {
+    const getProjectMembers = useCallback(async () => {
         try {
             const data: ProjectMember[] = await get_project_member({ project_id: project_id });
             setProjectMembers(data)
@@ -24,7 +25,7 @@ export default function ProjectMembers({ project_id, session }: { project_id: nu
             console.error('Error fetching project data:', error);
             return null;
         }
-    }
+    }, [project_id]);
 
     const handleEditMember = (edit_startus: string) => {
         setShowMemberModal(false);
@@ -34,7 +35,7 @@ export default function ProjectMembers({ project_id, session }: { project_id: nu
 
     useEffect(() => {
         getProjectMembers()
-    }, []);
+    }, [getProjectMembers]);
 
     return (
         <div className="sm:col-span-3 rounded-md border border-gray-300 bg-white p-5 text-base text-gray-700">
@@ -101,7 +102,6 @@ export default function ProjectMembers({ project_id, session }: { project_id: nu
                     return (
                         <li
                             key={member.userId.userId}
-                            // onClick={() => openEditUser(member.user.userId)}
                             className="flex justify-between gap-x-6 py-5 px-4 rounded-lg group shadow"
                         >
                             <div className="flex min-w-0 gap-x-4">
@@ -121,8 +121,6 @@ export default function ProjectMembers({ project_id, session }: { project_id: nu
                     );
                 })}
             </ul>
-
-            {/* <pre>{JSON.stringify(projectMembers, null, 2)}</pre> */}
 
             {showMemberModal && (
                 <ModalEditMember

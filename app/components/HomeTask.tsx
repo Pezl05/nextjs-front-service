@@ -1,19 +1,21 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { format } from 'date-fns';
-import { Project, Task, TaskSearch, get_tasks, delete_task, get_projects, get_projects_by_user } from '../project/components/actions';
-import { ChevronDownIcon, CheckCircleIcon, PencilIcon, TrashIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
+import { get_tasks, delete_task, get_projects, get_projects_by_user } from '../project/components/actions';
+import { ChevronDownIcon, CheckCircleIcon, PencilIcon, TrashIcon, InformationCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import type { Project, Task, TaskSearch }from '../project/components/actions';
+import type { Session } from './SessionContext';
 import ModalEditTask from '../project/[id]/components/ModalEditTask';
 import ModalDelete from './ModalDelete';
 import React from 'react';
 
-export default function HomeTask({ session }: { session: any }) {
+export default function HomeTask({ session }: { session: Session | null }) {
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [tasks, setTasks] = useState<Task[]>([]);
     const [isEdit, setIsEdit] = useState(false);
-    const [tasksSearch, setTasksSearch] = useState<TaskSearch>({});
+    const [tasksSearch, setTasksSearch] = useState<TaskSearch>({ start_date: format(new Date(), 'yyyy-MM-dd'), due_date: format(new Date(), 'yyyy-MM-dd') });
 
     const startDateRef = useRef<HTMLInputElement>(null!);
 
@@ -27,14 +29,14 @@ export default function HomeTask({ session }: { session: any }) {
     const [msgDelete, setMsgDelete] = useState("");
     const [deleteId, setDeleteId] = useState<number | null>(null);
 
-    const handleSearchChange = (key: keyof TaskSearch, value: string | number | Date | boolean | undefined) => {
+    const handleSearchChange = (key: keyof TaskSearch, value: string | number | number[] | Date | boolean | undefined) => {
         setTasksSearch(prev => ({
             ...prev,
             [key]: value
         }));
     };
 
-    async function getProjects() {
+    const getProjects = useCallback(async () => {
         try {
             let data: Project[] = ([]);
 
@@ -45,15 +47,15 @@ export default function HomeTask({ session }: { session: any }) {
             }
 
             const projectIds = data.map(project => project.projectId);
-            setTasksSearch({ project_id: projectIds });
+            handleSearchChange("project_id", projectIds);
             setProjects(data);
         } catch (error) {
             console.error('Error fetching project data:', error);
             return null;
         }
-    }
+    }, [session]);
 
-    async function getTasks() {
+    const getTasks = useCallback(async () => {
         try {
             const data = await get_tasks(tasksSearch);
             setTasks(data);
@@ -61,7 +63,7 @@ export default function HomeTask({ session }: { session: any }) {
         } catch (error) {
             console.error('Error fetching tasks:', error);
         }
-    }
+    }, [tasksSearch]);
 
     const handleDateClick = (ref: React.RefObject<HTMLInputElement>) => {
         if (ref.current) {
@@ -125,12 +127,11 @@ export default function HomeTask({ session }: { session: any }) {
 
     useEffect(() => {
         getProjects();
-    }, []);
+    }, [getProjects]);
 
     useEffect(() => {
-        console.log(tasksSearch)
-        getTasks()
-    }, [tasksSearch]);
+        getTasks();
+    }, [getTasks]);
 
     return (
 
@@ -138,7 +139,6 @@ export default function HomeTask({ session }: { session: any }) {
             <div className="mb-5 pt-2 px-5 flex flex-wrap items-center gap-4 sm:flex-nowrap w-full">
                 <div className="flex w-full flex-wrap items-center gap-4 sm:flex-nowrap sm:w-auto">
 
-                    {/* Search Input for Project Name */}
                     <input
                         type="text"
                         placeholder="Project Search..."
@@ -147,7 +147,6 @@ export default function HomeTask({ session }: { session: any }) {
                         className="w-full sm:w-52 rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-base text-gray-700 placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none sm:text-sm"
                     />
 
-                    {/* Search Input for Task Title */}
                     <input
                         type="text"
                         placeholder="Task Search..."
@@ -156,7 +155,6 @@ export default function HomeTask({ session }: { session: any }) {
                         className="w-full sm:w-52 rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-base text-gray-700 placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none sm:text-sm"
                     />
 
-                    {/* Start Date Button and Input */}
                     <div className="relative w-full sm:w-52">
                         <button
                             id="bt_start_date"
@@ -171,14 +169,13 @@ export default function HomeTask({ session }: { session: any }) {
                             id="start_date"
                             name="start_date"
                             type="date"
-                            value={tasksSearch.start_date || (new Date()).toString()}
+                            value={tasksSearch.start_date}
                             ref={startDateRef}
                             onChange={(e) => handleDate(e.target.value)}
                             className="absolute inset-0 z-0 w-full h-full opacity-0 pointer-events-none"
                         />
                     </div>
 
-                    {/* Status Select Dropdown */}
                     <div className="relative w-full sm:w-52">
                         <select
                             value={tasksSearch?.status || ""}
@@ -196,7 +193,6 @@ export default function HomeTask({ session }: { session: any }) {
                         />
                     </div>
 
-                    {/* Phase Select Dropdown */}
                     <div className="relative w-full sm:w-52">
                         <select
                             value={tasksSearch?.phase || ""}
@@ -216,7 +212,18 @@ export default function HomeTask({ session }: { session: any }) {
                 </div>
             </div>
 
+            {error && (
 
+                <div onClick={() => setError("")} className="cursor-pointer m-5 px-4 pb-4 pt-5 sm:p-6 sm:pb-4 bg-red-100 border-2 border-gray-600 rounded-lg">
+                    <div className="flex">
+                        <ExclamationTriangleIcon aria-hidden="true" className="size-6 text-red-600 mr-5" />
+                        <div className="text-base font-semibold text-gray-900">
+                            {error}
+                        </div>
+                    </div>
+                </div>
+
+            )}
 
             {editStatus.status && (
 
