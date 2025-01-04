@@ -124,6 +124,7 @@ export default function ModalEditMember({ project_id, project_members, session, 
                 <div className="flex items-center">
                     {!isSessionUser && !selected && (
                         <button
+                            type="button"
                             onClick={() => toggleSelection(user.user_id)}
                             className="bg-green-500 hover:bg-green-700 text-white rounded-full p-2 ml-2"
                         >
@@ -132,6 +133,7 @@ export default function ModalEditMember({ project_id, project_members, session, 
                     )}
                     {!isSessionUser && selected && (
                         <button
+                            type="button"
                             onClick={() => toggleSelection(user.user_id)}
                             className="bg-red-500 hover:bg-red-700 text-white rounded-full p-2 ml-2"
                         >

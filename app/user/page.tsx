@@ -23,7 +23,7 @@ export default function User() {
     const data = await get_users(searchName, searchRole);
     setUsers(data);
     setLoading(false);
-  }, [searchName, searchRole]); 
+  }, [searchName, searchRole]);
 
 
   const openEditUser = (user_id: number) => {
@@ -66,7 +66,7 @@ export default function User() {
 
       {addStatus && (
 
-        <div onClick={() => setAddStatus(false)} className="cursor-pointer px-4 pb-4 pt-5 sm:p-6 sm:pb-4 bg-green-100 flex justify-start items-center border-2 border-gray-600 rounded-lg">
+        <div onClick={() => setAddStatus(false)} className="cursor-pointer my-5 px-4 pb-4 pt-5 sm:p-6 sm:pb-4 bg-green-100 flex justify-start items-center border-2 border-gray-600 rounded-lg">
           <div className="flex items-center">
             <CheckCircleIcon aria-hidden="true" className="size-12 text-green-600 mr-5" />
             <div className="text-xl font-semibold text-gray-900">
@@ -79,7 +79,7 @@ export default function User() {
 
       {editStatus.status && (
 
-        <div onClick={() => setEditStatus({status: false, message: ""})} className="cursor-pointer px-4 pb-4 pt-5 sm:p-6 sm:pb-4 bg-green-100 flex justify-start items-center border-2 border-gray-600 rounded-lg">
+        <div onClick={() => setEditStatus({ status: false, message: "" })} className="cursor-pointer my-5 px-4 pb-4 pt-5 sm:p-6 sm:pb-4 bg-green-100 flex justify-start items-center border-2 border-gray-600 rounded-lg">
           <div className="flex items-center">
             <CheckCircleIcon aria-hidden="true" className="size-12 text-green-600 mr-5" />
             <div className="text-xl font-semibold text-gray-900">

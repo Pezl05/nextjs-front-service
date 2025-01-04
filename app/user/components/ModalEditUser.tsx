@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { get_user, reset_password, delete_users } from './actions';
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
+import ModalDelete from '@/app/components/ModalDelete'
 import { edit_users } from './actions'
 import { CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
@@ -22,6 +23,7 @@ export default function ModalEditUser({ user_id, open, onClose }: EditUserProps)
     const [first_name, setFirstName] = useState("");
     const [last_name, setLastName] = useState("");
     const [role, setRole] = useState("member");
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
 
 
     const getUser = useCallback(async () => {
@@ -65,10 +67,11 @@ export default function ModalEditUser({ user_id, open, onClose }: EditUserProps)
                 setError(result.message || "Failed to delete user. Please try again.")
                 return;
             }
-
+            setShowDeleteModal(false)
             onClose(true, `User ${username} successfully deleted.`);
         } catch (error) {
             console.log("Error: ", error)
+            setShowDeleteModal(false)
             setError("Failed to delete user. Please try again.")
         }
 
@@ -197,7 +200,7 @@ export default function ModalEditUser({ user_id, open, onClose }: EditUserProps)
                                             <button
                                                 type="button"
                                                 data-autofocus
-                                                onClick={() => handleDeleteUser()}
+                                                onClick={() => setShowDeleteModal(true)}
                                                 className="inline-flex w-full justify-center rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-red-700 sm:w-18"
                                             >
                                                 Delete
@@ -307,6 +310,15 @@ export default function ModalEditUser({ user_id, open, onClose }: EditUserProps)
                     </DialogPanel>
                 </div>
             </div>
+
+            {showDeleteModal && (
+                <ModalDelete
+                    message={username}
+                    open={showDeleteModal}
+                    onClose={handleDeleteUser}
+                />
+            )}
+
         </Dialog>
     );
 }

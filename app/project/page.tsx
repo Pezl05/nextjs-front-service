@@ -72,7 +72,7 @@ export default function Project() {
 
       )}
 
-      <div className="mb-3 flex flex-wrap items-center gap-4 sm:flex-nowrap">
+      <div className="m-3 flex flex-wrap items-center gap-4 sm:flex-nowrap">
         <div className="flex w-full flex-wrap items-center gap-4 sm:flex-nowrap sm:w-auto">
 
           <input

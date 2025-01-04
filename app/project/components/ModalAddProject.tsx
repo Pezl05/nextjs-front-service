@@ -180,6 +180,7 @@ export default function ModalAddProject({ open, onClose }: AddProjectProps) {
                                         <div className="relative mt-2 h-10">
                                             <button
                                                 id="bt_start_date"
+                                                type="button"
                                                 onClick={() => handleDateClick(startDateRef)}
                                                 className="relative z-10 block w-full h-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                                             >
@@ -210,6 +211,7 @@ export default function ModalAddProject({ open, onClose }: AddProjectProps) {
                                         <div className="relative mt-2 h-10">
                                             <button
                                                 id="bt_end_date"
+                                                type="button"
                                                 onClick={() => handleDateClick(endDateRef)}
                                                 className="relative z-10 block w-full h-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                                             >
