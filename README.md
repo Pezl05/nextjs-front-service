@@ -1,36 +1,218 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Environment
 
-## Getting Started
+.env file
+```Environment
+# The URL of the authentication service API
+AUTH_API=<Authentication service API URL, e.g., http://localhost:3000>
 
-First, run the development server:
+# The URL of the project management service API
+PROJECT_API=<Project management service API URL, e.g., http://localhost:3001>
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# The URL of the task management service API
+TASK_API=<Task management service API URL, e.g., http://localhost:3002>
+
+# A secret key for signing and verifying JSON Web Tokens (JWT)
+JWT_KEY=<Strong and unique key for JWT authentication>
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+# Run Development
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Initialize the database first, and set up Authentication [[Go Auth Service](https://github.com/Pezl05/go-auth-service)] , Project Services [[NestJS Project Service](https://github.com/Pezl05/nestjs-project-service)] and Task Services [[Python Task Service](https://github.com/Pezl05/python-task-service)].
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```Docker-compose file
+# Docker-compose.yaml file
+version: '3.8'
 
-## Learn More
+services:
+  db:
+    image: postgres:latest
+    container_name: project_mgmt_db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: P@ssw0rd
+      POSTGRES_DB: project_mgmt
+    volumes:
+      - ./database/data:/var/lib/postgresql/data
+      # - ./database/migrations:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    networks:
+      - project_network
+  
+  auth-service:
+    image: go-auth-service:v1
+    container_name: auth-service
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=admin
+      - DB_PASSWORD=P@ssw0rd
+      - DB_NAME=project_mgmt
+      - JWT_KEY=P@ssw0rd
+    ports:
+      - "3000:3000"
+    networks:
+      - project_network
+    depends_on:
+      - db
+    restart: unless-stopped
 
-To learn more about Next.js, take a look at the following resources:
+  project-service:
+    image: nestjs-project-service:v1
+    container_name: project-service
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=admin
+      - DB_PASSWORD=P@ssw0rd
+      - DB_NAME=project_mgmt
+      - JWT_KEY=P@ssw0rd
+    ports:
+      - "3001:3000"
+    networks:
+      - project_network
+    depends_on:
+      - auth-service
+    restart: unless-stopped    
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+  task-service:
+    image: python-task-service:v1
+    container_name: task-service
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=admin
+      - DB_PASSWORD=P@ssw0rd
+      - DB_NAME=project_mgmt
+      - JWT_KEY=P@ssw0rd
+    ports:
+      - "3002:3000"
+    networks:
+      - project_network
+    depends_on:
+      - project-service
+    restart: unless-stopped
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+volumes:
+  postgres_data:
 
-## Deploy on Vercel
+networks:
+  project_network:
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Create & Run Database Container using Docker Compose 
+```
+$ docker compose up -d
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Build Command.
+```
+# Download dependencies
+$ npm install
+
+# NextJS Run Application for Development
+$ npm run dev
+```
+
+# Run Container
+```
+version: '3.8'
+
+services:
+  db:
+    image: postgres:latest
+    container_name: project_mgmt_db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: P@ssw0rd
+      POSTGRES_DB: project_mgmt
+    volumes:
+      - ./database/data:/var/lib/postgresql/data
+      # - ./database/migrations:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    networks:
+      - project_network
+  
+  auth-service:
+    image: go-auth-service:v1
+    container_name: auth-service
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=admin
+      - DB_PASSWORD=P@ssw0rd
+      - DB_NAME=project_mgmt
+      - JWT_KEY=P@ssw0rd
+    ports:
+      - "3000:3000"
+    networks:
+      - project_network
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  project-service:
+    image: nestjs-project-service:v1
+    container_name: project-service
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=admin
+      - DB_PASSWORD=P@ssw0rd
+      - DB_NAME=project_mgmt
+      - JWT_KEY=P@ssw0rd
+    ports:
+      - "3001:3000"
+    networks:
+      - project_network
+    depends_on:
+      - auth-service
+    restart: unless-stopped    
+
+  task-service:
+    image: python-task-service:v1
+    container_name: task-service
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=admin
+      - DB_PASSWORD=P@ssw0rd
+      - DB_NAME=project_mgmt
+      - JWT_KEY=P@ssw0rd
+    ports:
+      - "3002:3000"
+    networks:
+      - project_network
+    depends_on:
+      - project-service
+    restart: unless-stopped
+
+  front-service:
+    build: .
+    image: nextjs-front-service:v1
+    container_name: front-service
+    ports:
+      - "3003:3000"
+    networks:
+      - project_network
+    depends_on:
+      - task-service
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  project_network:
+```
+
+Create & Run container using Docker Compose.
+```
+$ docker compose up -d --build
+```
+
+Stop & Delete container using Docker Compose.
+```
+$ docker compose down
+```

@@ -1,0 +1,20 @@
+replicaCount: 1
+appName: front-service
+
+image:
+  repository: harbor.pezl.local/app-test1/app1/nextjs-front-service
+  tag: "v1"
+  pullPolicy: IfNotPresent
+
+service:
+  type: NodePort
+  port: 3000
+  targetPort: 3000
+  nodePort: 30080
+
+env_enabled: true
+env:
+  AUTH_API: http://auth-service:3000
+  PROJECT_API: http://project-service:3000
+  TASK_API: http://task-service:3000
+  JWT_KEY: P@ssw0rd
