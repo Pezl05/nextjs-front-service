@@ -20,22 +20,19 @@ export default function ModalAddUser({ open, onClose }: AddUserProps) {
         const errorState = { username: !formData.get('username'), first_name: !formData.get('first_name'), last_name: !formData.get('last_name') };
         setFormError(errorState);
         if (errorState.username || errorState.first_name || errorState.last_name) {
-            console.log(errorState)
             return;
         }
 
         try {
             const result = await add_users(formData)
-            console.log(result)
             if (!result.success) {
                 setError(result.message || "Failed to add user. Please try again.")
                 return;
             }
 
             onClose(true);
-        } catch (error) {
-            console.log("Error: ", error)
-            setError("Failed to add user. Please try again.")
+        } catch (err) {
+            setError(`Failed to add user. Please try again. ${err}`)
         }
 
     }

@@ -50,22 +50,19 @@ export default function ModalAddProject({ open, onClose }: AddProjectProps) {
         const errorState = { name: !formData.get('name'), status: !formData.get('status') };
         setFormError(errorState);
         if (errorState.name || errorState.status) {
-            console.log(errorState)
             return;
         }
 
         try {
             const result = await add_projects(formData)
-            console.log(result)
             if (!result.success) {
                 setError(result.message || "Failed to add project. Please try again.")
                 return;
             }
 
             onClose(true);
-        } catch (error) {
-            console.log("Error: ", error)
-            setError("Failed to add project. Please try again.")
+        } catch (err) {
+            setError(`Failed to add project. Please try again. ${err}`)
         }
 
     }

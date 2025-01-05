@@ -36,10 +36,9 @@ export default function ProjectPage({
           setShowDeleteModal(false)
         }
         router.push("/project");
-      } catch (error) {
-        console.log("Error: ", error)
+      } catch (err) {
         setShowDeleteModal(false)
-        setError("Failed to delete task. Please try again.")
+        setError(`Failed to delete task. Please try again. ${err}`)
       }
     }
   };

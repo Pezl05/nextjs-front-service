@@ -44,8 +44,8 @@ export default function ProjectInfo({ project_id, session }: { project_id: numbe
                 setUpdateDate(data.updatedAt.toString())
 
             setLoading(false)
-        } catch (error) {
-            console.error('Error fetching project data:', error);
+        } catch (err) {
+            console.error("Error fetching project:", err);
             redirect('/404');
         }
     }, [project_id]);
@@ -90,9 +90,8 @@ export default function ProjectInfo({ project_id, session }: { project_id: numbe
             setEditStatus({ status: true, message: result.message })
             setLoading(true)
             getProject()
-        } catch (error) {
-            console.log("Error: ", error)
-            setError("Failed to edit project. Please try again.")
+        } catch (err) {
+            setError(`Failed to edit project. Please try again. ${err}`)
         }
     }
 

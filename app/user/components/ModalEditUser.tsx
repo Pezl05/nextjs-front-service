@@ -39,22 +39,19 @@ export default function ModalEditUser({ user_id, open, onClose }: EditUserProps)
         const errorState = { username: !formData.get('username'), first_name: !formData.get('first_name'), last_name: !formData.get('last_name') };
         setFormError(errorState);
         if (errorState.username || errorState.first_name || errorState.last_name) {
-            console.log(errorState)
             return;
         }
 
         try {
             const result = await edit_users(user_id, formData)
-            console.log(result)
             if (!result.success) {
                 setError(result.message || "Failed to edit user. Please try again.")
                 return;
             }
 
             onClose(true, "User successfully updated.");
-        } catch (error) {
-            console.log("Error: ", error)
-            setError("Failed to edit user. Please try again.")
+        } catch (err) {
+            setError(`Failed to edit user. Please try again. ${err}`)
         }
 
     }
@@ -69,10 +66,9 @@ export default function ModalEditUser({ user_id, open, onClose }: EditUserProps)
             }
             setShowDeleteModal(false)
             onClose(true, `User ${username} successfully deleted.`);
-        } catch (error) {
-            console.log("Error: ", error)
+        } catch (err) {
             setShowDeleteModal(false)
-            setError("Failed to delete user. Please try again.")
+            setError(`Failed to delete user. Please try again. ${err}`)
         }
 
     }
@@ -80,16 +76,14 @@ export default function ModalEditUser({ user_id, open, onClose }: EditUserProps)
     async function handleRePass() {
         try {
             const result = await reset_password(user_id)
-            console.log(result)
             if (!result.success) {
                 setError(result.message || "Failed to reset passowrd. Please try again.")
                 return;
             }
 
             setRePass(true)
-        } catch (error) {
-            console.log("Error: ", error)
-            setError("Failed to reset passowrd. Please try again.")
+        } catch (err) {
+            setError(`Failed to reset passowrd. Please try again. ${err}`)
         }
 
     }

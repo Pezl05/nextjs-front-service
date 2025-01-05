@@ -1,4 +1,5 @@
 'use server'
+import { logger } from '@/lib';
 import { cookies } from 'next/headers'
 
 export interface Project {
@@ -67,10 +68,13 @@ export async function get_projects(name?: string, status?: string): Promise<Proj
         if (!res.ok) {
             throw new Error("Failed to fetch projects");
         }
+        
         const data = await res.json();
         return data;
-    } catch (error) {
-        console.log("Error: ", error);
+    } catch (err) {
+        logger.error(`Error during fetching projects with name: ${name}, status: ${status}. Message: ${err instanceof Error ? err.message : "Unknown error"}`);
+        logger.error(`Stack trace: ${err instanceof Error ? err.stack : "No stack trace available"}`);
+
         return [];
     }
 }
@@ -88,10 +92,13 @@ export async function get_project(project_id: number): Promise<Project> {
         if (!res.ok) {
             throw new Error("Project not found.");
         }
+
         const data = await res.json();
         return data;
-    } catch (error) {
-        console.log("Error: ", error);
+    } catch (err) {
+        logger.error(`Error during fetching project ID: ${project_id}. Message: ${err instanceof Error ? err.message : "Unknown error"}`);
+        logger.error(`Stack trace: ${err instanceof Error ? err.stack : "No stack trace available"}`);
+
         throw new Error("Failed to fetch project");
     }
 }
@@ -113,8 +120,10 @@ export async function get_projects_by_user(user_id?: number): Promise<Project[]>
         const project = data.map((item: ProjectMember) => item.projectId);
 
         return project;
-    } catch (error) {
-        console.log("Error: ", error);
+    } catch (err) {
+        logger.error(`Error during fetching projects by user ID: ${user_id}. Message: ${err instanceof Error ? err.message : "Unknown error"}`);
+        logger.error(`Stack trace: ${err instanceof Error ? err.stack : "No stack trace available"}`);
+
         return [];
     }
 }
@@ -135,7 +144,6 @@ export async function add_projects(formData: FormData) {
         rawFormData.start_date = startDate;
         rawFormData.end_date = endDate;
     }
-
     const rawFormDataJson = JSON.stringify(rawFormData)
 
     try {
@@ -149,15 +157,16 @@ export async function add_projects(formData: FormData) {
             body: rawFormDataJson,
             credentials: 'include'
         })
-
         if (!res.ok) {
             const errorData = await res.json();
             return { success: false, message: errorData.message || "Failed to add project. Please try again." }
         }
 
         return { success: true, message: "Project successfully added." }
-    } catch (error) {
-        console.log("Error: ", error);
+    } catch (err) {
+        logger.error(`Error during project creation. Message: ${err instanceof Error ? err.message : "Unknown error"}`);
+        logger.error(`Stack trace: ${err instanceof Error ? err.stack : "No stack trace available"}`);
+
         return { success: false, message: "Failed to add project. Please try again." }
     }
 }
@@ -178,7 +187,6 @@ export async function edit_projects(project_id: number, formData: FormData) {
         rawFormData.startDate = startDate;
         rawFormData.endDate = endDate;
     }
-
     const rawFormDataJson = JSON.stringify(rawFormData)
 
     try {
@@ -192,15 +200,16 @@ export async function edit_projects(project_id: number, formData: FormData) {
             body: rawFormDataJson,
             credentials: 'include'
         })
-
         if (!res.ok) {
             const errorData = await res.json();
             return { success: false, message: errorData.message || "Failed to edit project. Please try again." }
         }
 
         return { success: true, message: "Project successfully updated." }
-    } catch (error) {
-        console.log("Error: ", error);
+    } catch (err) {
+        logger.error(`Error during project update. Project ID: ${project_id}. Message: ${err instanceof Error ? err.message : "Unknown error"}`);
+        logger.error(`Stack trace: ${err instanceof Error ? err.stack : "No stack trace available"}`);
+
         return { success: false, message: "Failed to edit project. Please try again." }
     }
 }
@@ -216,15 +225,17 @@ export async function delete_project(project_id: number) {
             },
             credentials: 'include'
         })
-
         if (!res.ok) {
             const errorData = await res.json();
             return { success: false, message: errorData.message || "Failed to delete project. Please try again." }
         }
 
+        logger.info(`Project deleted successfully. Project ID: ${project_id}.`);
         return { success: true, message: "Project successfully deleted." }
-    } catch (error) {
-        console.log("Error: ", error);
+    } catch (err) {
+        logger.error(`Error during project deletion. Project ID: ${project_id}. Message: ${err instanceof Error ? err.message : "Unknown error"}`);
+        logger.error(`Stack trace: ${err instanceof Error ? err.stack : "No stack trace available"}`);
+
         return { success: false, message: "Failed to delete project. Please try again." }
     }
 }
@@ -240,14 +251,16 @@ export async function get_project_member({ project_id, user_id }: { project_id?:
                 "Cookie": `jwt=${cookieStore?.value}`
             }
         })
-
         if (!res.ok) {
             throw new Error("Failed to fetch project members");
         }
+
         const data = await res.json();
         return data;
-    } catch (error) {
-        console.log("Error: ", error);
+    } catch (err) {
+        logger.error(`Error during fetching project members. Project ID: ${project_id ?? "N/A"}, User ID: ${user_id ?? "N/A"}. Message: ${err instanceof Error ? err.message : "Unknown error"}`);
+        logger.error(`Stack trace: ${err instanceof Error ? err.stack : "No stack trace available"}`);
+
         return [];
     }
 }
@@ -258,7 +271,6 @@ export async function add_project_member(project_id: number, user_id: number) {
         userId: Number(user_id),
         role: "member"
     }
-
     const rawFormDataJson = JSON.stringify(rawFormData)
 
     try {
@@ -272,21 +284,21 @@ export async function add_project_member(project_id: number, user_id: number) {
             body: rawFormDataJson,
             credentials: 'include'
         })
-
         if (!res.ok) {
             const errorData = await res.json();
             return { success: false, message: errorData.message || "Failed to add member. Please try again." }
         }
 
         return { success: true, message: "Member successfully added." }
-    } catch (error) {
-        console.log("Error: ", error);
+    } catch (err) {
+        logger.error(`Error during adding project member. Project ID: ${project_id}, User ID: ${user_id}. Message: ${err instanceof Error ? err.message : "Unknown error"}`);
+        logger.error(`Stack trace: ${err instanceof Error ? err.stack : "No stack trace available"}`);
+
         return { success: false, message: "Failed to add member. Please try again." }
     }
 }
 
 export async function delete_project_members(project_member_id: number) {
-
     try {
         const cookieStore = (await cookies()).get('jwt');
         const res = await fetch(`${PROJECT_API}/api/v1/project_members/${project_member_id}`, {
@@ -297,15 +309,16 @@ export async function delete_project_members(project_member_id: number) {
             },
             credentials: 'include'
         })
-
         if (!res.ok) {
             const errorData = await res.json();
             return { success: false, message: errorData.message || "Failed to delete member. Please try again." }
         }
 
         return { success: true, message: "Member successfully deleted." }
-    } catch (error) {
-        console.log("Error: ", error);
+    } catch (err) {
+        logger.error(`Error during deleting project member with ID: ${project_member_id}. Message: ${err instanceof Error ? err.message : "Unknown error"}`);
+        logger.error(`Stack trace: ${err instanceof Error ? err.stack : "No stack trace available"}`);
+
         return { success: false, message: "Failed to delete member. Please try again." }
     }
 }
@@ -313,8 +326,8 @@ export async function delete_project_members(project_member_id: number) {
 export async function get_tasks(search?: TaskSearch): Promise<Task[]> {
     try {
         const cookieStore = (await cookies()).get('jwt');
-        const projectIds = search?.project_id 
-            ? search.project_id.map(id => `project_id=${id}`).join("&") 
+        const projectIds = search?.project_id
+            ? search.project_id.map(id => `project_id=${id}`).join("&")
             : "";
 
         const param = `${projectIds}`
@@ -327,7 +340,6 @@ export async function get_tasks(search?: TaskSearch): Promise<Task[]> {
             + `${search?.offset ? `&offset=${search.offset}` : ""}`
             + `${search?.limit ? `&limit=${search.limit}` : ""}`;
 
-
         const res = await fetch(`${TASK_API}/api/v1/tasks/?${param}`, {
             method: "GET",
             headers: {
@@ -335,15 +347,16 @@ export async function get_tasks(search?: TaskSearch): Promise<Task[]> {
                 "Cookie": `jwt=${cookieStore?.value}`
             }
         })
-
-
         if (!res.ok) {
             throw new Error("Failed to fetch tasks.");
         }
+
         const data = await res.json();
         return data;
-    } catch (error) {
-        console.log("Error: ", error);
+    } catch (err) {
+        logger.error(`Error during fetching tasks. Message: ${err instanceof Error ? err.message : "Unknown error"}`);
+        logger.error(`Stack trace: ${err instanceof Error ? err.stack : "No stack trace available"}`);
+
         return [];
     }
 }
@@ -367,7 +380,6 @@ export async function add_tasks(project_id: number, created_by: number, formData
         rawFormData.start_date = startDate;
         rawFormData.due_date = endDate;
     }
-
     const rawFormDataJson = JSON.stringify(rawFormData)
 
     try {
@@ -381,15 +393,16 @@ export async function add_tasks(project_id: number, created_by: number, formData
             body: rawFormDataJson,
             credentials: 'include'
         })
-
         if (!res.ok) {
             const errorData = await res.json();
             return { success: false, message: errorData.message || "Failed to add task. Please try again." }
         }
 
         return { success: true, message: "Task successfully added." }
-    } catch (error) {
-        console.log("Error: ", error);
+    } catch (err) {
+        logger.error(`Error during task creation for project ID: ${project_id} by user ID: ${created_by}. Message: ${err instanceof Error ? err.message : "Unknown error"}`);
+        logger.error(`Stack trace: ${err instanceof Error ? err.stack : "No stack trace available"}`);
+
         return { success: false, message: "Failed to add task. Please try again." }
     }
 }
@@ -411,7 +424,6 @@ export async function edit_tasks(task_id: number, formData: FormData) {
         rawFormData.start_date = startDate;
         rawFormData.due_date = endDate;
     }
-
     const rawFormDataJson = JSON.stringify(rawFormData)
 
     try {
@@ -425,15 +437,16 @@ export async function edit_tasks(task_id: number, formData: FormData) {
             body: rawFormDataJson,
             credentials: 'include'
         })
-
         if (!res.ok) {
             const errorData = await res.json();
             return { success: false, message: errorData.message || "Failed to edit task. Please try again." }
         }
 
         return { success: true, message: "Task successfully updated." }
-    } catch (error) {
-        console.log("Error: ", error);
+    } catch (err) {
+        logger.error(`Error during task update for task ID: ${task_id}. Message: ${err instanceof Error ? err.message : "Unknown error"}`);
+        logger.error(`Stack trace: ${err instanceof Error ? err.stack : "No stack trace available"}`);
+
         return { success: false, message: "Failed to edit task. Please try again." }
     }
 }
@@ -449,15 +462,16 @@ export async function delete_task(task_id: number) {
             },
             credentials: 'include'
         })
-
         if (!res.ok) {
             const errorData = await res.json();
             return { success: false, message: errorData.message || "Failed to delete task. Please try again." }
         }
 
         return { success: true, message: "Task successfully deleted." }
-    } catch (error) {
-        console.log("Error: ", error);
+    } catch (err) {
+        logger.error(`Error during task deletion for task ID: ${task_id}. Message: ${err instanceof Error ? err.message : "Unknown error"}`);
+        logger.error(`Stack trace: ${err instanceof Error ? err.stack : "No stack trace available"}`);
+
         return { success: false, message: "Failed to delete task. Please try again." }
     }
 }

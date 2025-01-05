@@ -59,23 +59,20 @@ export default function ModalEditTask({ isEdit, task, open, onClose }: EditTaskP
         const errorState = { title: !formData.get('title'), phase: !formData.get('phase'), status: !formData.get('status') };
         setFormError(errorState);
         if (errorState.title || errorState.phase || errorState.status) {
-            console.log(errorState)
             return;
         }
 
         if (task) {
             try {
                 const result = await edit_tasks(task?.task_id, formData)
-                console.log(result)
                 if (!result.success) {
                     setError(result.message || "Failed to edit task. Please try again.")
                     return;
                 }
 
                 onClose(true, `Successfully to edit task ${formData.get('title')} in project.`);
-            } catch (error) {
-                console.log("Error: ", error)
-                setError("Failed to edit task. Please try again.")
+            } catch (err) {
+                setError(`Failed to edit task. Please try again. ${err}`)
             }
         }
 

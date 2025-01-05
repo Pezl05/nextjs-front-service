@@ -21,8 +21,8 @@ export default function ProjectMembers({ project_id, session }: { project_id: nu
             const data: ProjectMember[] = await get_project_member({ project_id: project_id });
             setProjectMembers(data)
             setLoading(false)
-        } catch (error) {
-            console.error('Error fetching project data:', error);
+        } catch (err) {
+            setError(`Error fetching project members data. ${err}`);
             return null;
         }
     }, [project_id]);

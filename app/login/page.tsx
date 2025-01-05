@@ -13,7 +13,6 @@ export default function Login() {
         const errorState = { username: !formData.get('username'), password: !formData.get('password')};
         setFormError(errorState);
         if(errorState.username || errorState.password ){
-            console.log(errorState)
             return;
         }
 
@@ -25,9 +24,8 @@ export default function Login() {
             }
 
             router.replace('/')
-        } catch (error) {
-            console.log("Error: ", error)
-            setError("An error occurred during login. Please try again later.")
+        } catch (err) {
+            setError(`An error occurred during login. Please try again later. ${err}`)
         }
 
     }

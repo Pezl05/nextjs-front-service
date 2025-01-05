@@ -16,13 +16,11 @@ export async function middleware(request: NextRequest) {
 
   let cookie = request.cookies.get('jwt')
   if (!cookie?.value) {
-    console.log('JWT Not found');
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
   const payload = await decrypt(cookie.value);
   if (!payload){
-    console.log('Unauthorized');
     return NextResponse.redirect(new URL('/login', request.url))
   }
 

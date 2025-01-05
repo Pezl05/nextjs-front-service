@@ -58,22 +58,19 @@ export default function ModalAddTask({ project_id, create_by, open, onClose }: A
         const errorState = { title: !formData.get('title'), phase: !formData.get('phase'), status: !formData.get('status') };
         setFormError(errorState);
         if (errorState.title || errorState.phase || errorState.status) {
-            console.log(errorState)
             return;
         }
 
         try {
             const result = await add_tasks(project_id, create_by, formData)
-            console.log(result)
             if (!result.success) {
                 setError(result.message || "Failed to add task. Please try again.")
                 return;
             }
 
             onClose(`Successfully to add task ${formData.get('title')} in project.`);
-        } catch (error) {
-            console.log("Error: ", error)
-            setError("Failed to add task. Please try again.")
+        } catch (err) {
+            setError(`Failed to add task. Please try again. ${err}`)
         }
 
     }

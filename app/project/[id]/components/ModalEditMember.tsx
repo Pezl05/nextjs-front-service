@@ -37,8 +37,9 @@ export default function ModalEditMember({ project_id, project_members, session, 
             setSelectedUsers(selectedUserIds);
 
             setLoading(false);
-        } catch (error) {
-            console.error("Error fetching users:", error);
+        } catch (err) {
+            setError(`Error fetching users data. ${err}`);
+            return null;
         }
     }, [project_members]);
 
@@ -73,7 +74,6 @@ export default function ModalEditMember({ project_id, project_members, session, 
 
                 if (user) {
                     const res = await add_project_member(project_id, user_id);
-                    console.log(res)
                     if (!res.success) {
                         failed.push(`Added : ${user.full_name}`);
                     } else {
@@ -92,9 +92,8 @@ export default function ModalEditMember({ project_id, project_members, session, 
 
             onClose(`${success.length > 0 ? `Successfully to edit members in project.\n- ${success.join("\n- ")}` : ""}`)
 
-        } catch (error) {
-            console.error('Failed to edit members in project.', error);
-            setError("Failed to edit members in project.");
+        } catch (err) {
+            setError(`Failed to edit members in project. ${err}`);
         }
     }
 

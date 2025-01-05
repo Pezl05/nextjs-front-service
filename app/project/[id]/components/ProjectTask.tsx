@@ -40,8 +40,8 @@ export default function ProjectTask({ project_id, session }: { project_id: numbe
             const data: Task[] = await get_tasks(tasksSearch);
             setTasks(data)
             setLoading(false)
-        } catch (error) {
-            console.error('Error fetching project data:', error);
+        } catch (err) {
+            setError(`Error fetching task data. ${err}`);
             return null;
         }
     }, [tasksSearch]);
@@ -91,9 +91,8 @@ export default function ProjectTask({ project_id, session }: { project_id: numbe
                     setShowDeleteModal(false);
                     getProjectTasks()
                 }
-            } catch (error) {
-                console.log("Error: ", error)
-                setError("Failed to delete task. Please try again.")
+            } catch (err) {
+                setError(`Failed to delete task. Please try again. ${err}`)
             }
         }
     };

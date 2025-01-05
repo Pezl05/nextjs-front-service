@@ -1,4 +1,5 @@
 'use server'
+import { logger } from '@/lib';
 import { cookies } from 'next/headers'
 
 export interface User {
@@ -25,10 +26,13 @@ export async function get_users(name?:string , role?:string): Promise<User[]> {
         if (!res.ok) {
             throw new Error("Failed to fetch users");
         }
-        const data = await res.json(); // Parse the response body as JSON
+
+        const data = await res.json();
         return data;
-    } catch (error) {
-        console.log("Error: ", error);
+    } catch (err) {
+        logger.error(`Error occurred during user fetch. Message: ${err instanceof Error ? err.message : "Unknown error"}`);
+        logger.error(`Stack trace: ${err instanceof Error ? err.stack : "No stack trace available"}`);
+
         return [];
     }
 }
@@ -46,10 +50,11 @@ export async function get_user(user_id: number): Promise<User> {
         if (!res.ok) {
             throw new Error("Failed to fetch users");
         }
-        const data = await res.json(); // Parse the response body as JSON
+        const data = await res.json();
         return data;
-    } catch (error) {
-        console.log("Error: ", error);
+    } catch (err) {
+        logger.error(`Error occurred during fetching user with ID: ${user_id}. Message: ${err instanceof Error ? err.message : "Unknown error"}`);
+        logger.error(`Stack trace: ${err instanceof Error ? err.stack : "No stack trace available"}`);
         throw new Error("Failed to fetch users");
     }
 }
@@ -83,8 +88,9 @@ export async function add_users(formData: FormData) {
         }
         
         return { success: true, message: "User successfully added." }
-    } catch (error) {
-        console.log("Error: ", error);
+    } catch (err) {
+        logger.error(`Error during user creation for username: ${rawFormData.username}. Message: ${err instanceof Error ? err.message : "Unknown error"}`);
+        logger.error(`Stack trace: ${err instanceof Error ? err.stack : "No stack trace available"}`);
         return { success: false, message: "Failed to add user. Please try again." }
     }
 }
@@ -117,8 +123,10 @@ export async function edit_users(user_id: number ,formData: FormData) {
         }
         
         return { success: true, message: "User successfully updated." }
-    } catch (error) {
-        console.log("Error: ", error);
+    } catch (err) {
+        logger.error(`Error during editing user with ID: ${user_id}. Message: ${err instanceof Error ? err.message : "Unknown error"}`);
+        logger.error(`Stack trace: ${err instanceof Error ? err.stack : "No stack trace available"}`);
+
         return { success: false, message: "Failed to edit user. Please try again." }
     }
 }
@@ -140,10 +148,13 @@ export async function delete_users(user_id: number) {
             const errorData = await res.json();
             return { success: false, message: errorData.message || "Failed to delete user. Please try again." }
         }
-        
+        logger.info(`User with ID: ${user_id} successfully deleted.`);
+
         return { success: true, message: "User successfully deleted." }
-    } catch (error) {
-        console.log("Error: ", error);
+    } catch (err) {
+        logger.error(`Error during deleting user with ID: ${user_id}. Message: ${err instanceof Error ? err.message : "Unknown error"}`);
+        logger.error(`Stack trace: ${err instanceof Error ? err.stack : "No stack trace available"}`);
+
         return { success: false, message: "Failed to delete user. Please try again." }
     }
 }
@@ -172,8 +183,10 @@ export async function reset_password(user_id: number, password?: string) {
         }
         
         return { success: true, message: "Reset password successfully." }
-    } catch (error) {
-        console.log("Error: ", error);
+    } catch (err) {
+        logger.error(`Error during password reset for user ID: ${user_id}. Message: ${err instanceof Error ? err.message : "Unknown error"}`);
+        logger.error(`Stack trace: ${err instanceof Error ? err.stack : "No stack trace available"}`);
+
         return { success: false, message: "Failed to reset passowrd. Please try again." }
     }
 }

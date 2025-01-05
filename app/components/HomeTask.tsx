@@ -49,8 +49,8 @@ export default function HomeTask({ session }: { session: Session | null }) {
             const projectIds = data.map(project => project.projectId);
             handleSearchChange("project_id", projectIds);
             setProjects(data);
-        } catch (error) {
-            console.error('Error fetching project data:', error);
+        } catch (err) {
+            setError(`Error fetching project data. ${err}`);
             return null;
         }
     }, [session]);
@@ -60,8 +60,9 @@ export default function HomeTask({ session }: { session: Session | null }) {
             const data = await get_tasks(tasksSearch);
             setTasks(data);
             setLoading(false);
-        } catch (error) {
-            console.error('Error fetching tasks:', error);
+        } catch (err) {
+            setError(`Error fetching task data. ${err}`);
+            return null;
         }
     }, [tasksSearch]);
 
@@ -118,9 +119,8 @@ export default function HomeTask({ session }: { session: Session | null }) {
                     setShowDeleteModal(false);
                     getTasks()
                 }
-            } catch (error) {
-                console.log("Error: ", error)
-                setError("Failed to delete task. Please try again.")
+            } catch (err) {
+                setError(`Failed to delete task. Please try again. ${err}`)
             }
         }
     };
