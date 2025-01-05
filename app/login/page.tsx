@@ -9,7 +9,6 @@ export default function Login() {
     const [error, setError] = useState("");
     const router = useRouter();
 
-
     async function handleLogin(formData: FormData) {
         const errorState = { username: !formData.get('username'), password: !formData.get('password')};
         setFormError(errorState);
