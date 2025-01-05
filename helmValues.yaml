@@ -1,20 +1,28 @@
 replicaCount: 1
-appName: front-service
+appName: front-mgmt
 
 image:
-  repository: harbor.pezl.local/app-test1/app1/nextjs-front-service
-  tag: "v1"
+  repository: "harbor.pezl.local/project_mgmt/nextjs-front-service"
+  tag: "latest"
   pullPolicy: IfNotPresent
 
 service:
-  type: NodePort
+  type: ClusterIP
   port: 3000
   targetPort: 3000
-  nodePort: 30080
 
-env_enabled: true
+ingress:
+  enabled: true
+  rewriteTarget: /
+  tls:
+    secretName: project-mgmt-tls
+    hosts: project-mgmt.pezl.local
+  host: project-mgmt.pezl.local
+  paths: /
+  pathType: Prefix
+
 env:
-  AUTH_API: http://auth-service:3000
-  PROJECT_API: http://project-service:3000
-  TASK_API: http://task-service:3000
-  JWT_KEY: P@ssw0rd
+  AUTH_API: "http://auth-mgmt-service:3000"
+  PROJECT_API: "http://project-mgmt-service:3000"
+  TASK_API: "http://task-mgmt-service:3000"
+  JWT_KEY: "P@ssw0rd"
