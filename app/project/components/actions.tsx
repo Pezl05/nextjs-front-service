@@ -129,7 +129,7 @@ export async function get_projects_by_user(user_id?: number): Promise<Project[]>
 }
 
 export async function add_projects(formData: FormData) {
-    const rawFormData: { name: string, status: string, description?: string, start_date?: string, end_date?: string } = {
+    const rawFormData: { name: string, status: string, description?: string, startDate?: string, endDate?: string } = {
         name: (formData.get('name') as string).trim(),
         status: (formData.get('status') as string).trim()
     }
@@ -141,10 +141,11 @@ export async function add_projects(formData: FormData) {
     const startDate = formData.get('start_date') as string;
     const endDate = formData.get('end_date') as string;
     if (startDate && endDate) {
-        rawFormData.start_date = startDate;
-        rawFormData.end_date = endDate;
+        rawFormData.startDate = startDate;
+        rawFormData.endDate = endDate;
     }
     const rawFormDataJson = JSON.stringify(rawFormData)
+    console.log(rawFormDataJson)
 
     try {
         const cookieStore = (await cookies()).get('jwt');
