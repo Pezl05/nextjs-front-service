@@ -145,7 +145,6 @@ export async function add_projects(formData: FormData) {
         rawFormData.endDate = endDate;
     }
     const rawFormDataJson = JSON.stringify(rawFormData)
-    console.log(rawFormDataJson)
 
     try {
         const cookieStore = (await cookies()).get('jwt');
