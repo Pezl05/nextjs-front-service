@@ -13,6 +13,12 @@ TASK_API=<Task management service API URL, e.g., http://localhost:3002>
 
 # A secret key for signing and verifying JSON Web Tokens (JWT)
 JWT_KEY=<Strong and unique key for JWT authentication>
+
+# The endpoint for OpenTelemetry data export
+OTEL_EXPORTER_OTLP_ENDPOINT=<OpenTelemetry exporter endpoint, e.g., http://localhost:4318>
+
+# The log level for OpenTelemetry logging
+OTEL_LOG_LEVEL=<Log level, e.g., info, debug, warn, error>
 ```
 
 # Run Development
