@@ -22,9 +22,12 @@ ingress:
   pathType: Prefix
 
 env:
+  OTEL_RESOURCE_ATTRIBUTES: "service.name=front-service"
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger-collector.observability:4318
+  OTEL_LOG_LEVEL: error
+
+secret:
   AUTH_API: "http://auth-mgmt-service:3000"
   PROJECT_API: "http://project-mgmt-service:3000"
   TASK_API: "http://task-mgmt-service:3000"
   JWT_KEY: "P@ssw0rd"
-  OTEL_EXPORTER_OTLP_ENDPOINT: "http://jaeger-collector.observability:4318"
-  OTEL_LOG_LEVEL: error
