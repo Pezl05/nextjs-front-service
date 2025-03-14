@@ -23,7 +23,7 @@ ingress:
 
 env:
   OTEL_RESOURCE_ATTRIBUTES: "service.name=front-service"
-  OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger-collector.observability:4318
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo-distributor.observability:4318
   OTEL_LOG_LEVEL: error
 
 secret:
